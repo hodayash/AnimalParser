@@ -19,11 +19,15 @@ def merge_animals_tables(tables):
     merges the animals tables to one table of animal + collateral adjectives.
     :return: pd.DataFrame representing all animals' data
     """
-    relevant = [table for table in tables if ANIMAL_COL in table.columns.to_list()]
+    relevant = [table for table in tables if consts.ANIMAL_COL in table.columns.to_list()]
     if len(relevant) > 1:
         animals = pd.concat(relevant)
         return animals
     return relevant[0]
+def prepare_filters(filters):
+    filters = [f"({filter})" for filter in filters]
+    all_filters = "|".join(filters)
+    return all_filters
 
 def grab_relevant_data(df):
     """
@@ -31,10 +35,17 @@ def grab_relevant_data(df):
     from the 'Animal' (animal name) column.
     :return: pd.DataFrame, containing 'Animals' and 'Collateral adjectives'
     """
-    filters = [f"({filter})" for filter in consts.FILTERS]
-    all_filters = "|".join(filters)
-    filtered = df[consts.ANIMAL_COL].replace(all_filters, "", regex=True)
-    df[consts.ANIMAL_COL] = filtered
+    # removes values which point to another value
+    df = df[~df[consts.ANIMAL_COL].str.contains("See ")]
+
+    # changes all blank or unknown values to string 'unknown'
+    df[consts.COLLATERAL_ADJECTIVE_COL] = df[consts.COLLATERAL_ADJECTIVE_COL].str.strip(" \n?")
+    df[consts.COLLATERAL_ADJECTIVE_COL].replace(r'^$', 'Unknown', regex=True, inplace=True)
+
+    # remove irrelevant data from relevant names such as "see also"
+    all_filters = prepare_filters(consts.FILTERS)
+    df[consts.ANIMAL_COL].replace(all_filters, "", regex=True, inplace=True)
+
 
     return df[[consts.ANIMAL_COL, consts.COLLATERAL_ADJECTIVE_COL]]
 
@@ -43,7 +54,11 @@ def pretty_print(data):
     For each collateral adjective, prints all animals.
     :return: None
     """
-    pass
+    by_adjective = data.groupby(consts.COLLATERAL_ADJECTIVE_COL)
+    for adjective, animals in by_adjective:
+        all_animals = ', '.join(animals["Animal"].tolist())
+        print(f"{adjective}: {all_animals}")
+
 
 def main():
     hp = HTMLTableParser()
