@@ -11,12 +11,7 @@ This file can also be imported as a module in order to use the animal grabber.
 """
 import pandas as pd
 from html_parser import HTMLTableParser
-
-ANIMALS_WIKI_PAGE = r"https://en.wikipedia.org/wiki/List_of_animal_names"
-COLLATERAL_ADJECTIVES_COL = "Collateral adjective"
-ANIMAL_COL = "Animal"
-
-FILTERS = (r"- .*", r" See.*", r" \(.*", r"Also see.*", r" \xa0.*", r"\n", r"\[.*")
+import consts
 
 def merge_animals_tables(tables):
     """
@@ -36,12 +31,12 @@ def grab_relevant_data(df):
     from the 'Animal' (animal name) column.
     :return: pd.DataFrame, containing 'Animals' and 'Collateral adjectives'
     """
-    filters = [f"({filter})" for filter in FILTERS]
+    filters = [f"({filter})" for filter in consts.FILTERS]
     all_filters = "|".join(filters)
-    filtered = df[ANIMAL_COL].replace(all_filters, "", regex=True)
-    df[ANIMAL_COL] = filtered
+    filtered = df[consts.ANIMAL_COL].replace(all_filters, "", regex=True)
+    df[consts.ANIMAL_COL] = filtered
 
-    return df[[ANIMAL_COL, COLLATERAL_ADJECTIVES_COL]]
+    return df[[consts.ANIMAL_COL, consts.COLLATERAL_ADJECTIVE_COL]]
 
 def pretty_print(data):
     """
@@ -52,7 +47,7 @@ def pretty_print(data):
 
 def main():
     hp = HTMLTableParser()
-    tables = hp.parse_url(ANIMALS_WIKI_PAGE)
+    tables = hp.parse_url(consts.ANIMALS_WIKI_PAGE)
     df = merge_animals_tables(tables)
     relevant_data = grab_relevant_data(df)
     pretty_print(relevant_data)
