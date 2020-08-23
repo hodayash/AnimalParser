@@ -30,13 +30,13 @@ def parse_html_table(table):
             if row:
                 parsed_table.append(row)
 
-        #we assume the row width is consistent
-        table_width = len(column_names) if column_names else len(parsed_table[0])
-        table_height = len(parsed_table)
+    #we assume the row width is consistent
+    table_width = len(column_names) if column_names else len(parsed_table[0])
+    table_height = len(parsed_table)
 
-        titles = column_names if column_names else range(0, table_width)
+    titles = column_names if column_names else range(0, table_width)
 
-        df = pd.DataFrame(parsed_table, columns=titles,
+    df = pd.DataFrame(parsed_table, columns=titles,
                           index=range(0, table_height))
-                
-        return df
+ 
+    return df
