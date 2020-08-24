@@ -16,6 +16,9 @@ def parse_html_table(table):
     """
     parsed_table = []
     column_names = []
+   
+    for br in table.find_all("br"):
+        br.replace_with("\n")
 
     #did not use list comprehension so the code will be readable
     for row in table.find_all('tr'):
