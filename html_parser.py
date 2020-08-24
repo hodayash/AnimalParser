@@ -8,6 +8,7 @@ def parse_url(url):
     return [parse_html_table(table) \
             for table in soup.find_all('table')]  
 
+
 def parse_html_table(table):
     """
     finds the relevant tags for a table.

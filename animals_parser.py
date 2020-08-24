@@ -11,6 +11,7 @@ import pandas as pd
 from html_parser import parse_url
 import consts
 
+
 def merge_animals_tables(tables):
     """
     merges the animals tables to one table of animal + collateral adjectives.
@@ -23,6 +24,7 @@ def merge_animals_tables(tables):
         return animals
     return relevant[0]
 
+
 def prepare_filters(filters):
     """
     :param filters:  list of regular expressions
@@ -31,6 +33,7 @@ def prepare_filters(filters):
     filters = [f"({filter})" for filter in filters]
     all_filters = "|".join(filters)
     return all_filters
+
 
 def grab_relevant_data(table):
     """
@@ -53,6 +56,7 @@ def grab_relevant_data(table):
 
     return table[[consts.ANIMAL_COL, consts.COLLATERAL_ADJECTIVE_COL]]
 
+
 def duplicate_rows(table):
     """
     duplicates the rows where the Collateral adjective is more than one,
@@ -65,6 +69,7 @@ def duplicate_rows(table):
     table[consts.COLLATERAL_ADJECTIVE_COL] = table[consts.COLLATERAL_ADJECTIVE_COL].str.strip()
     return table  
 
+
 def pretty_print(data):
     """
     For each collateral adjective, prints all animals.
@@ -75,6 +80,7 @@ def pretty_print(data):
     for adjective, animals in by_adjective:
         all_animals = ', '.join(animals[consts.ANIMAL_COL].tolist())
         print(f"{adjective}: {all_animals}")
+
 
 def main():
     tables = parse_url(consts.ANIMALS_WIKI_PAGE)
