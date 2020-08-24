@@ -2,39 +2,44 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
-class HTMLTableParser:
-       
-        def parse_url(self, url):
-            response = requests.get(url)
-            soup = BeautifulSoup(response.text, 'lxml')
-            return [self.parse_html_table(table)\
-                    for table in soup.find_all('table')]  
-    
-        def parse_html_table(self, table):
-            parsed = [(row.find_all('th'), len(row.find_all('td'))) for row in table.find_all('tr')]
+def parse_url(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+    return [parse_html_table(table) \
+            for table in soup.find_all('table')]  
 
-            # checks if have exactly one row name
-            if len([{} for i in parsed if len(i[0]) != 1]) != 0:
-                raise Exception("must contain row title")
+def parse_html_table(table):
+    """
+    finds the relevant tags for a table.
+    :param table: an html 'table' object of BeautifulSoup
+    :return: a DataFrame object representing the table.
+    """
+    parsed_table = []
+    column_names = []
 
+    #did not use list comprehension so the code will be readable
+    for br in table.find_all("br"):
+        br.replace_with("\n")
 
-            columns = [parsed[0][0] for i in parsed]
+    for row in table.find_all('tr'):
+        #grabs the table headers, only the first row containing it
+        th_tags = row.find_all('th')
+        if th_tags and not column_names:
+            #would let us create titles for the DataFrame
+            column_names = [th.get_text().strip() for th in th_tags]
+        else: 
+            td_tags = row.find_all('td')
+            row = [td.get_text().strip() for td in td_tags]
+            if row:
+                parsed_table.append(row)
 
-            df = pd.DataFrame(columns = columns,
-                              index= range(0, len(parsed)))
+    #we assume the row width is consistent
+    table_width = len(column_names) if column_names else len(parsed_table[0])
+    table_height = len(parsed_table)
 
-            for row_index, row in enumerate(table.find_all('tr')):
-                columns = row.find_all('td')
+    titles = column_names if column_names else range(0, table_width)
 
-                for col_inedx, column in enumerate(columns):
-                    df.iat[row_index, col_inedx] = column.get_text()
-    
-                    
-            # Convert to float if possible
-            for col in df:
-                try:
-                    df[col] = df[col].astype(float)
-                except ValueError:
-                    pass
-            
-            return df
+    df = pd.DataFrame(parsed_table, columns=titles,
+                          index=range(0, table_height))
+ 
+    return df
