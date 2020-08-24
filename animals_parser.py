@@ -51,7 +51,6 @@ def grab_relevant_data(table):
     table[consts.ANIMAL_COL].replace(all_filters, "", regex=True, inplace=True)
     table.loc[:, consts.ANIMAL_COL] = table[consts.ANIMAL_COL].apply(lambda x: x.strip(" \n?") if isinstance(x, str) else x)
 
-
     return table[[consts.ANIMAL_COL, consts.COLLATERAL_ADJECTIVE_COL]]
 
 def duplicate_rows(table):
@@ -64,7 +63,7 @@ def duplicate_rows(table):
     table[consts.COLLATERAL_ADJECTIVE_COL] = table[consts.COLLATERAL_ADJECTIVE_COL].apply(lambda x: x.split("\n"))
     table = table.explode(consts.COLLATERAL_ADJECTIVE_COL) 
     table[consts.COLLATERAL_ADJECTIVE_COL] = table[consts.COLLATERAL_ADJECTIVE_COL].str.strip()
-    return table   
+    return table  
 
 def pretty_print(data):
     """
@@ -77,13 +76,13 @@ def pretty_print(data):
         all_animals = ', '.join(animals[consts.ANIMAL_COL].tolist())
         print(f"{adjective}: {all_animals}")
 
-
 def main():
     tables = parse_url(consts.ANIMALS_WIKI_PAGE)
     animals_table = merge_animals_tables(tables)
     relevant_data = grab_relevant_data(animals_table)
     full = duplicate_rows(relevant_data)
     pretty_print(full)
+
 
 if __name__ == '__main__':
     main()

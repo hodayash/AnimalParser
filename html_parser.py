@@ -16,11 +16,11 @@ def parse_html_table(table):
     """
     parsed_table = []
     column_names = []
-
-    #did not use list comprehension so the code will be readable
+   
     for br in table.find_all("br"):
         br.replace_with("\n")
 
+    #did not use list comprehension so the code will be readable
     for row in table.find_all('tr'):
         #grabs the table headers, only the first row containing it
         th_tags = row.find_all('th')
