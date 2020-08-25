@@ -1,10 +1,10 @@
 """
-This script allows the user to print all the collateral adjectives
+This module allows the user to print all the collateral adjectives
 and the animals which belong to each one.
 It does so by scraping a web page and extracting relevant data.
 Requirements: Python 3.6+
 Packages: Pandas, requests, bs4 (BeautifulSoup)
-This file can also be imported as a module in order to use the animal grabber.
+This file is imported as a module in order to use the animal grabber.
 """
 
 import pandas as pd
