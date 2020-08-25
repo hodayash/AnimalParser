@@ -13,7 +13,6 @@ import consts
 import html_templates
 
 
-
 def merge_animals_tables(tables):
     """
     merges the animals tables to one table of animal + collateral adjectives.
@@ -90,6 +89,12 @@ def animal_relations(data):
 
 
 def dict_html_cache(to_html, path):
+    """
+    gets a dictionary and saves it to a nice-looking html page.
+    :param to_html: dictioanry
+    :param path: output path
+    :return: None
+    """
     body = ""
     for key, value in to_html.items():
         header = html_templates.HEADER.format(key=key)

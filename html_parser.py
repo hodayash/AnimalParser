@@ -3,6 +3,11 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 def parse_url(url):
+    """
+    parses all tables of an html page
+    :param url: url string
+    :return: list of parsed tables (as DataFrames)
+    """
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
     return [parse_html_table(table) \
