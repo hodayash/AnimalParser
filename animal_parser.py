@@ -49,10 +49,11 @@ def grab_relevant_data(table):
 
     # changes all blank or unknown values to string 'unknown'
     table.loc[:, consts.COLLATERAL_ADJECTIVE_COL] = table[consts.COLLATERAL_ADJECTIVE_COL].apply(lambda x: x.strip(" \n?") if isinstance(x, str) else x)
-    table[consts.COLLATERAL_ADJECTIVE_COL].replace(r'^$', 'Unknown', regex=True, inplace=True)
+    table[consts.COLLATERAL_ADJECTIVE_COL].replace(consts.ADJ_FILTER, '', regex=True, inplace=True)
+    table[consts.COLLATERAL_ADJECTIVE_COL].replace(consts.BLANK, 'Unknown', regex=True, inplace=True)
 
     # remove irrelevant data from relevant names such as "see also"
-    all_filters = prepare_filters(consts.FILTERS)
+    all_filters = prepare_filters(consts.NAMES_FILTERS)
     table[consts.ANIMAL_COL].replace(all_filters, "", regex=True, inplace=True)
     table.loc[:, consts.ANIMAL_COL] = table[consts.ANIMAL_COL].apply(lambda x: x.strip(" \n?") if isinstance(x, str) else x)
 
@@ -71,28 +72,7 @@ def duplicate_rows(table):
     table[consts.COLLATERAL_ADJECTIVE_COL] = table[consts.COLLATERAL_ADJECTIVE_COL].str.strip()
     return table  
 
-def dict_html_cache(func):
-    def wrapper(*args, **qwargs):
-        to_html = func(*args, **qwargs)
 
-        body = ""
-        for key, value in to_html.items():
-            header = html_templates.HEADER.format(key=key)
-            list_items = "\n".join([html_templates.LIST_ITEM.format(item=item) \
-                for item in value.split(", ")])
-
-            html_list = html_templates.LIST_WRAPPER.format(list_items=list_items)
-
-            body += f"{header}\n{html_list}"
-        
-        full_html = html_templates.HTML_TEMPLATE.format(body=body)
-        with open(r"output.html", 'w', encoding="utf8") as out:
-            out.write(full_html)
-        return func(*args, **qwargs)
-    return wrapper
-
-
-@dict_html_cache
 def animal_relations(data):
     """
     For each collateral adjective, saves all animals in dictionary.
@@ -105,18 +85,26 @@ def animal_relations(data):
     for adjective, animals in by_adjective:
         all_animals = ', '.join(animals[consts.ANIMAL_COL].tolist())
         results[adjective] = all_animals
-        print(f"{adjective}:{all_animals}")
 
     return results 
 
 
-def main():
-    tables = parse_url(consts.ANIMALS_WIKI_PAGE)
-    animals_table = merge_animals_tables(tables)
-    relevant_data = grab_relevant_data(animals_table)
-    full = duplicate_rows(relevant_data)
-    relations = animal_relations(full)
+def dict_html_cache(to_html, path):
+    body = ""
+    for key, value in to_html.items():
+        header = html_templates.HEADER.format(key=key)
+        list_items = "\n".join([html_templates.LIST_ITEM.format(item=item) \
+            for item in value.split(", ")])
+
+        html_list = html_templates.LIST_WRAPPER.format(list_items=list_items)
+
+        body += f"{header}\n{html_list}"
+    
+    full_html = html_templates.HTML_TEMPLATE.format(body=body)
+    with open(path, 'w', encoding="utf8") as out:
+        out.write(full_html)
 
 
-if __name__ == '__main__':
-    main()
+def pretty_print(dictionary):
+    for key, value in dictionary.items():
+        print(f"{key}: {value}")

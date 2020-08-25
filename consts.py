@@ -3,6 +3,8 @@ COLLATERAL_ADJECTIVE_COL = "Collateral adjective"
 ANIMAL_COL = "Animal"
 
 #filters for non-wanted data of animal names
-FILTERS = (r"- .*", r" \(.*", r"Also see.*", r" \xa0.*", r"\[.*\]")
+NAMES_FILTERS = (r"- .*", r" \(.*", r"Also see.*", r" \xa0.*", r"\[.*\]")
+ADJ_FILTER = (r"\[.*\]", )
 
-BLANK = r"\?.*"
+BLANK = r'^$'
+
